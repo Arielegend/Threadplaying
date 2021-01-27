@@ -8,7 +8,7 @@ and we search for them in Shakespeare text!
 
 
 ### Installation 
-* clone repo
+* git clone https://github.com/Arielegend/Threadplaying
 * pip install .
 * shak
 
