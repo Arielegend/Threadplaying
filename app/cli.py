@@ -10,6 +10,7 @@ def cli(wc, tc):
     """Welcome to wordsplay Reporter"""
     wordscount = wc
     threadscount = tc
+    print(f"starting the search after {wc} random words,  using {tc} threads")
     main(wordscount, threadscount)
 
     print("done main.. Shutting down")

@@ -6,6 +6,7 @@ from RandomWordGenerator import RandomWord
 
 shakespeare_file = "app/shakespeare.txt"
 train_file = "train.txt"
+TOTAL = 0
 
 
 def main(words_count, threads_count):
@@ -22,6 +23,14 @@ def main(words_count, threads_count):
     end = time.time()
 
     printSummery(start, end, len(indexes) > 0)
+
+
+def getFileAsText(file_text):
+    file = open(file_text, mode='r')
+    all_of_it = file.read()
+    file.close()
+
+    return all_of_it
 
 
 def getWords(count):
@@ -56,22 +65,27 @@ def getRanges(len_of_list, num_of_ranges):
 # return the ok array we build
 # indicates which words appeared
 def lookForWords(words: [str], indexes: [int]) -> None:
+    file_text = getFileAsText(shakespeare_file)
     using_threads = len(indexes) > 0
     if using_threads:
-        lookForWordsUsingThreds(words, indexes)
+        lookForWordsUsingThreds(words, indexes, file_text)
     else:
-        lookForWordsIterative(words)
+        lookForWordsIterative(words, file_text)
+
+    global TOTAL
+    print(f"{TOTAL} words had been found")
 
 
-def lookForWordsIterative(words):
+def lookForWordsIterative(words, file_text):
     for word in words:
-        checkSpecificWordInFile(word)
+        checkSpecificWordInFile(word, file_text)
 
 
-def lookForWordsUsingThreds(words, indexes):
+def lookForWordsUsingThreds(words, indexes, file_text):
     threads = []
     for i in range(len(indexes)):
-        temp = threading.Thread(target=lookWithinRange, args=(words, indexes[0] + 1, i * indexes[0], i,))
+        temp = threading.Thread(target=lookWithinRange,
+                                args=(words, indexes[0] + 1, i * indexes[0], i, file_text,))
         threads.append(temp)
 
     for thread in threads:
@@ -81,40 +95,32 @@ def lookForWordsUsingThreds(words, indexes):
         thread.join()
 
 
-def lookWithinRange(words, count, startIndex, thread_id):
-    # print("args are -> ", words, count, startIndex, thread_id)
-
+def lookWithinRange(words, count, startIndex, thread_id, file_text, ):
     words_to_check = words[startIndex:startIndex + count]
     print(f"thread {thread_id} with starting index {startIndex} had started, he has {count} to check")
 
     for word in words_to_check:
         # print(f"startIndex) {startIndex}checking word - {word}")
-        checkSpecificWordInFile(word)
+        checkSpecificWordInFile(word, file_text)
 
     print(f"thread {thread_id}  had finished")
 
 
-def checkSpecificWordInFile(word_user: str) -> bool:
-    with open(shakespeare_file, 'r') as file:
-        txt = file.readline()
-
-        while txt != '':
-            txt_wards_array = txt.split()  # splitting wards by space, puts in array
-
-            for word_text in txt_wards_array:
-                if word_text == word_user:
-                    file.close()
-                    print(f"the ward) {word_user} is found")
-                    return True
-
-            txt = file.readline()
-
+def checkSpecificWordInFile(word_user: str, file_text: str) -> bool:
+    if word_user in file_text:
+        updateTotalBy1()
+        return True
     return False
 
 
 def printSummery(start: float, end: float, using_threads: bool):
     print("using threads %s" % str(using_threads))
     print("done in %s seconds " % str(end - start))
+
+
+def updateTotalBy1():
+    global TOTAL
+    TOTAL += 1
 
 
 if __name__ == '__main__':

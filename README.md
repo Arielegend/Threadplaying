@@ -10,7 +10,10 @@ and we search for them in Shakespeare text!
 ### Installation 
 * git clone https://github.com/Arielegend/Threadplaying
 * cd Threadplaying
-* pip install .
+
+make sure inside venv 
+
+* pip install . 
 * shak
 
 
